@@ -6,6 +6,8 @@ import org.ethereum.trie.TrieImpl;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.ethereum.crypto.HashUtil.*;
 
@@ -28,19 +30,24 @@ import static org.ethereum.crypto.HashUtil.*;
  */
 public class Genesis extends Block {
 
-    public final static BigInteger PREMINE_AMOUNT = BigInteger.valueOf(2).pow(200);
+    // map of address to value (in wei)
+    private static Map<String, String> premine = new HashMap<String, String>();
 
-    private static String[] premine = new String[]{
-            "dbdbdb2cbd23b783741e8d7fcf51e459b497e4a6",
-            "e4157b34ea9615cfbde6b4fda419828124b70c78", // # (CH)
-            "b9c015918bdaba24b4ff057a92a3873d6eb201be", // # (V)
-            "6c386a4b26f73c802f34673f7248bb118f97424a", // # (HH)
-            "cd2a3d9f938e13cd947ec05abc7fe734df8dd826", // # (R)
-            "2ef47100e0787b915105fd5e3f4ff6752079d5cb", // # (M)
-            "e6716f9544a56c530d868e4bfbacb172315bdead", // # (J)
-            "1a26338f0d905e295fccb71fa9ea849ffa12aaf4"  // # (A)
-    };
-
+    static {
+        // values from https://github.com/ethereum/cpp-ethereum/blob/develop/libethereum/GenesisInfo.cpp
+        premine.put("dbdbdb2cbd23b783741e8d7fcf51e459b497e4a6", "1606938044258990275541962092341162602522202993782792835301376");
+        premine.put("e6716f9544a56c530d868e4bfbacb172315bdead", "1606938044258990275541962092341162602522202993782792835301376");
+        premine.put("b9c015918bdaba24b4ff057a92a3873d6eb201be", "1606938044258990275541962092341162602522202993782792835301376");
+        premine.put("1a26338f0d905e295fccb71fa9ea849ffa12aaf4", "1606938044258990275541962092341162602522202993782792835301376");
+        premine.put("2ef47100e0787b915105fd5e3f4ff6752079d5cb", "1606938044258990275541962092341162602522202993782792835301376");
+        premine.put("cd2a3d9f938e13cd947ec05abc7fe734df8dd826", "1606938044258990275541962092341162602522202993782792835301376");
+        premine.put("6c386a4b26f73c802f34673f7248bb118f97424a", "1606938044258990275541962092341162602522202993782792835301376");
+        premine.put("e4157b34ea9615cfbde6b4fda419828124b70c78", "1606938044258990275541962092341162602522202993782792835301376");
+        premine.put("b0afc46d9ce366d06ab4952ca27db1d9557ae9fd", "154162184000000000000000");
+        premine.put("f6b1e9dc460d4d62cc22ec5f987d726929c0f9f0", "102774789000000000000000");
+        premine.put("cc45122d8b7fa0b1eaa6b29e0fb561422a9239d0", "51387394000000000000000");
+        premine.put("b7576e9d314df41ec5506494293afb1bd5d3f65d", "69423399000000000000000");
+    }
 
     private static byte[] zeroHash256 = new byte[32];
     private static byte[] zeroHash160 = new byte[20];
@@ -68,8 +75,9 @@ public class Genesis extends Block {
         Trie state = new TrieImpl(null);
         // The proof-of-concept series include a development pre-mine, making the state root hash
         // some value stateRoot. The latest documentation should be consulted for the value of the state root.
-        for (String address : premine) {
-            AccountState acctState = new AccountState(BigInteger.ZERO, PREMINE_AMOUNT);
+        for (String address : premine.keySet()) {
+            BigInteger amount = new BigInteger(premine.get(address), 10);
+            AccountState acctState = new AccountState(BigInteger.ZERO, amount);
             state.update(Hex.decode(address), acctState.getEncoded());
         }
 
@@ -83,7 +91,7 @@ public class Genesis extends Block {
         return instance;
     }
 
-    public final static String[] getPremine() {
+    public final static Map<String, String> getPremine() {
         return premine;
     }
 }

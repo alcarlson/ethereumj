@@ -2,7 +2,6 @@ package org.ethereum.manager;
 
 import org.ethereum.core.Block;
 import org.ethereum.core.Genesis;
-import org.ethereum.core.Transaction;
 import org.ethereum.core.TransactionReceipt;
 import org.ethereum.core.Wallet;
 import org.ethereum.crypto.HashUtil;
@@ -26,10 +25,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -146,9 +142,9 @@ public class WorldManager {
         Block bestBlock = blockStore.getBestBlock();
         if (bestBlock == null) {
             logger.info("DB is empty - adding Genesis");
-            for (String address : Genesis.getPremine()) {
-                repository.createAccount(Hex.decode(address));
-                repository.addBalance(Hex.decode(address), Genesis.PREMINE_AMOUNT);
+            for (Entry<String, String> entry : Genesis.getPremine().entrySet()) {
+                repository.createAccount(Hex.decode(entry.getKey()));
+                repository.addBalance(Hex.decode(entry.getKey()), new BigInteger(entry.getValue(), 10));
             }
 
             blockStore.saveBlock(Genesis.getInstance(), new ArrayList<TransactionReceipt>());

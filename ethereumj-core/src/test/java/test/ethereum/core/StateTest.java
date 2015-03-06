@@ -7,15 +7,13 @@ import org.ethereum.core.Genesis;
 import org.ethereum.crypto.HashUtil;
 import org.ethereum.trie.Trie;
 import org.ethereum.trie.TrieImpl;
-
 import org.junit.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.util.Map.Entry;
 
 import static org.junit.Assert.assertEquals;
 
@@ -113,9 +111,9 @@ public class StateTest {
     private Trie generateGenesisState() {
 
         Trie trie = new TrieImpl(new MockDB());
-        for (String address : Genesis.getPremine()) {
-            AccountState acct = new AccountState(BigInteger.ZERO, BigInteger.valueOf(2).pow(200));
-            trie.update(Hex.decode(address), acct.getEncoded());
+        for (Entry<String, String> entry : Genesis.getPremine().entrySet()) {
+            AccountState acct = new AccountState(BigInteger.ZERO, new BigInteger(entry.getValue(), 10));
+            trie.update(Hex.decode(entry.getKey()), acct.getEncoded());
         }
         return trie;
     }

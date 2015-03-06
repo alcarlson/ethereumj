@@ -7,15 +7,14 @@ import org.ethereum.datasource.LevelDbDataSource;
 import org.ethereum.db.RepositoryImpl;
 import org.ethereum.facade.Repository;
 import org.ethereum.vm.DataWord;
-
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.util.Map.Entry;
 
 import static org.junit.Assert.*;
 
@@ -348,8 +347,8 @@ public class RepositoryTest {
         Repository repository = new RepositoryImpl(new LevelDbDataSource(), new LevelDbDataSource());
         Repository track = repository.startTracking();
 
-        for (String address : Genesis.getPremine()) {
-            track.addBalance(Hex.decode(address), Genesis.PREMINE_AMOUNT);
+        for (Entry<String, String> entry : Genesis.getPremine().entrySet()) {
+            track.addBalance(Hex.decode(entry.getKey()), new BigInteger(entry.getValue(), 10));
         }
 
         track.commit();
